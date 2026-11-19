@@ -1,0 +1,26 @@
+---
+# Project clang-tidy configuration (C++23).
+# Run from the target:
+#   cmake --build build --target tidy
+#
+# Checks are kept to core, broadly-applicable diagnostics. Notably we do NOT
+# enable checks that assume a hosted standard library (e.g. anything requiring
+# exceptions or RTTI), because src/ is compiled -ffreestanding.
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -modernize-use-trailing-return-type,
+  -bugprone-easily-swappable-parameters
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: file
+# Short, idiomatic math-loop/parameter names (a, b, n, ...) are intentional
+# and formatting is enforced separately by clang-format, so identifier-length
+# is excluded to avoid noise.
+...
