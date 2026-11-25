@@ -51,6 +51,17 @@ target_compile_options(freestanding_core_test PRIVATE -Wall -Wextra)
 
 add_test(NAME freestanding_core_test COMMAND freestanding_core_test)
 
+# Host test for the freestanding std::array example. The header is
+# freestanding-only; this binary links the core (for the include dir) and
+# exercises it on the OS with the full standard library.
+add_executable(freestanding_array_test
+    test/freestanding_array_test.cpp
+)
+target_link_libraries(freestanding_array_test PRIVATE freestanding_core)
+target_compile_options(freestanding_array_test PRIVATE -Wall -Wextra)
+
+add_test(NAME freestanding_array_test COMMAND freestanding_array_test)
+
 # Build-then-test entry point: `cmake --build build --target check`.
 # Depends on the test executable, so building this target builds it first,
 # then runs the suite via CTest.
@@ -58,7 +69,7 @@ add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} --test-dir "${CMAKE_BINARY_DIR}" --output-on-failure
     COMMENT "Running tests with CTest"
 )
-add_dependencies(check freestanding_core_test)
+add_dependencies(check freestanding_core_test freestanding_array_test)
 
 # ---------------------------------------------------------------------------
 # Tooling: clang-format and clang-tidy.
@@ -75,6 +86,9 @@ set(FREESTANDING_SOURCES
     src/freestanding_core.hpp
     src/freestanding_core.cpp
     test/freestanding_core_test.cpp
+    src/freestanding_array.hpp
+    test/freestanding_array_test.cpp
+    test/test_utils.hpp
 )
 
 if(CLANG_FORMAT_EXECUTABLE)
@@ -84,7 +98,7 @@ if(CLANG_FORMAT_EXECUTABLE)
         COMMENT "Formatting sources with clang-format"
     )
     # Format the sources only after the compiled targets are in place.
-    add_dependencies(format freestanding_core freestanding_core_test)
+    add_dependencies(format freestanding_core freestanding_core_test freestanding_array_test)
 else()
     message(WARNING "clang-format not found; 'format' target disabled")
 endif()
@@ -98,7 +112,7 @@ if(CLANG_TIDY_EXECUTABLE)
         COMMENT "Running clang-tidy on sources"
     )
     # Check the sources only after the compiled targets are in place.
-    add_dependencies(tidy freestanding_core freestanding_core_test)
+    add_dependencies(tidy freestanding_core freestanding_core_test freestanding_array_test)
 else()
     message(WARNING "clang-tidy not found; 'tidy' target disabled")
 endif()

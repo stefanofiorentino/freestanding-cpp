@@ -7,34 +7,16 @@
 // correctly.
 
 #include <cstdlib>
-#include <iostream>
 
 #include "freestanding_core.hpp"
-
-namespace {
-
-int failures = 0;
-
-void check(bool ok, const char* what) {
-    if (ok) {
-        std::cout << "[PASS] " << what << '\n';
-    } else {
-        std::cout << "[FAIL] " << what << '\n';
-        ++failures;
-    }
-}
-
-} // namespace
+#include "test_utils.hpp"
 
 int main() {
-    check(core::add(2, 3) == 5, "core::add(2, 3) == 5");
-    check(core::diff(10, 4) == 6, "core::diff(10, 4) == 6");
-    check(core::factorial(6) == 720ULL, "core::factorial(6) == 720");
+    test::Reporter r;
 
-    if (failures == 0) {
-        std::cout << "All tests passed.\n";
-        return EXIT_SUCCESS;
-    }
-    std::cout << failures << " test(s) failed.\n";
-    return EXIT_FAILURE;
+    r.check(core::add(2, 3) == 5, "core::add(2, 3) == 5");
+    r.check(core::diff(10, 4) == 6, "core::diff(10, 4) == 6");
+    r.check(core::factorial(6) == 720ULL, "core::factorial(6) == 720");
+
+    return r.finish();
 }
